@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gemini API Text Generation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    select {
+      background-color: white;
+    }
+
+    .image-input-group {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 10px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #output {
+      white-space: pre-wrap;
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f8f8;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      min-height: 100px;
+    }
+
+    #apiKeySection {
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      border-radius: 4px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #clearApiKey {
+      background-color: #dc3545;
+      margin-left: 10px;
+    }
+
+    #clearApiKey:hover {
+      background-color: #c82333;
+    }
+
+    .status-message {
+      margin-top: 5px;
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .info-text {
+      font-size: 0.85em;
+      color: #666;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Gemini API Text Generation</h1>
+    
+    <div id="apiKeySection">
+      <div class="input-group">
+        <label for="apiKey">API Key</label>
+        <input type="password" id="apiKey" placeholder="Enter your Gemini API key">
+        <button onclick="saveApiKey()">Save API Key</button>
+        <button id="clearApiKey" onclick="clearApiKey()">Clear API Key</button>
+      </div>
+      <div class="status-message" id="apiKeyStatus"></div>
+    </div>
+
+    <div class="input-group">
+      <label for="prompt">Prompt</label>
+      <input type="text" id="prompt" placeholder="Enter your prompt, e.g., 'describe the image'">
+    </div>
+
+    <div class="input-group">
+      <label for="imageUrl">Image URL</label>
+      <input type="text" id="imageUrl" placeholder="Enter image URL">
+      <div class="info-text">Supported formats: PNG, JPEG, WEBP, HEIC, HEIF</div>
+    </div>
+
+    <button onclick="generateText()">Generate Text</button>
+    <div id="image-preview"></div>
+    <div id="output"></div>
+
+    <script>
+      // Check and update API key status on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        updateApiKeyStatus();
+      });
+
+      function updateApiKeyStatus() {
+        const apiKey = localStorage.getItem('geminiApiKey');
+        const statusElement = document.getElementById('apiKeyStatus');
+        const apiKeyInput = document.getElementById('apiKey');
+        
+        if (apiKey) {
+          statusElement.textContent = 'API Key is saved';
+          statusElement.style.color = '#28a745';
+          apiKeyInput.value = ''; // Clear the input field
+        } else {
+          statusElement.textContent = 'No API Key saved';
+          statusElement.style.color = '#dc3545';
+        }
+      }
+
+      function saveApiKey() {
+        const apiKey = document.getElementById('apiKey').value.trim();
+        if (apiKey) {
+          localStorage.setItem('geminiApiKey', apiKey);
+          updateApiKeyStatus();
+        } else {
+          alert('Please enter an API key');
+        }
+      }
+
+      function clearApiKey() {
+        localStorage.removeItem('geminiApiKey');
+        document.getElementById('apiKey').value = '';
+        updateApiKeyStatus();
+      }
+
+      async function generateText() {
+        const prompt = document.getElementById('prompt').value || 'describe the image';
+        const imageUrl = document.getElementById('imageUrl').value;
+        const apiKey = localStorage.getItem('geminiApiKey');
+        const outputElement = document.getElementById('output');
+
+        if (!apiKey) {
+          outputElement.textContent = 'Please save your API key first.';
+          return;
+        }
+
+        if (!prompt || !imageUrl) {
+          outputElement.textContent = 'Please fill in both prompt and image URL fields.';
+          return;
+        }
+
+        outputElement.textContent = 'Generating response...';
+
+        try {
+          const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+          
+          const [mimeType, base64String] = await imageUrlToBase64(imageUrl);
+          const requestBody = {
+            contents: [{
+              parts: [
+                { text: prompt },
+                { 
+                  inlineData: {
+                    mimeType,
+                    data:  base64String
+                  }
+                }
+              ]
+            }]
+          };
+
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          
+          // Extract the text from the response
+          if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
+            outputElement.textContent = data.candidates[0].content.parts[0].text;
+            document.getElementById('image-preview').innerHTML = `<img src="data:${mimeType};base64,${base64String}" style="max-width: 100%; margin-top: 10px;">`;
+          } else {
+            throw new Error('Unexpected response format');
+          }
+        } catch (error) {
+          outputElement.textContent = 'Error: ' + error.message;
+        }
+      }
+
+      async function imageUrlToBase64(imageUrl) {
+        try {
+          // Fetch the image
+          const response = await fetch(imageUrl);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          // Get the image as a blob
+          const blob = await response.blob();
+          
+          // Create a FileReader to read the blob
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              // reader.result contains the base64 string that starts with 'data:image/png;base64,'
+              const base64String = reader.result.split(',')[1];
+              const mimeType = reader.result.split(',')[0].split(':')[1].split(';')[0];
+              resolve([mimeType, base64String]);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+        } catch (error) {
+          console.error('Error converting image to base64:', error);
+          throw error;
+        }
+      }
+    </script>
+  </div>
+</body>
+</html>
