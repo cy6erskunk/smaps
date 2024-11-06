@@ -111,6 +111,25 @@
       color: #666;
       margin-top: 4px;
     }
+
+    .canvas-container {
+      width: 100%;
+      background-color: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      max-width: 100%;
+    }
+
+    .error {
+      color: #dc2626;
+      margin-top: 10px;
+      display: none;
+    }
   </style>
 </head>
 
@@ -140,8 +159,14 @@
     </div>
 
     <button onclick="generateText()">Generate Text</button>
+
+    <div id="error" class="error"></div>
+
     <div id="image-preview"></div>
     <div id="output"></div>
+    <div class="canvas-container">
+      <canvas id="imageCanvas"></canvas>
+    </div>
 
     <script>
       // Check and update API key status on page load
@@ -233,8 +258,9 @@
           
           // Extract the text from the response
           if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
-            outputElement.textContent = data.candidates[0].content.parts[0].text;
-            document.getElementById('image-preview').innerHTML = `<img src="data:${mimeType};base64,${base64String}" style="max-width: 100%; margin-top: 10px;">`;
+            const responseText = data.candidates[0].content.parts[0].text;
+            outputElement.textContent = responseText;
+            scaleAndRenderToCanvas(imageUrl);
           } else {
             throw new Error('Unexpected response format');
           }
@@ -270,6 +296,78 @@
           console.error('Error converting image to base64:', error);
           throw error;
         }
+      }
+
+      function scaleAndRenderToCanvas(imageUrl) {
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.querySelector('.canvas-container');
+        const errorElement = document.getElementById('error');
+
+        if (!imageUrl) {
+          showError('Please enter an image URL');
+          return;
+        }
+
+        function loadImage() {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';  // Enable CORS for images from different domains
+
+          img.onload = function () {
+            debugger;
+            errorElement.style.display = 'none';
+
+            // Get container width
+            const containerWidth = container.clientWidth;
+
+            // Calculate scaling ratio
+            let scale = 1;
+            if (img.width > containerWidth) {
+              scale = containerWidth / img.width;
+            }
+
+            // Set canvas dimensions
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+
+            // Clear previous content
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw scaled image
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          };
+
+          img.onerror = function () {
+            showError('Failed to load image. Please check the URL and try again.');
+            // Reset canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.width = 0;
+            canvas.height = 0;
+          };
+
+          // Start loading the image
+          img.src = imageUrl;
+        }
+
+        function showError(message) {
+          errorElement.textContent = message;
+          errorElement.style.display = 'block';
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+          const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const containerWidth = container.clientWidth;
+
+          if (canvas.width > containerWidth) {
+            const scale = containerWidth / canvas.width;
+            canvas.width = containerWidth;
+            canvas.height *= scale;
+            ctx.putImageData(img, 0, 0);
+          }
+        });
+
+        loadImage();
       }
     </script>
   </div>
