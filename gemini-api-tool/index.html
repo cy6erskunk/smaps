@@ -40,6 +40,11 @@
       border-radius: 4px;
     }
 
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
     select {
       background-color: white;
     }
@@ -125,7 +130,7 @@
 
     <div class="input-group">
       <label for="prompt">Prompt</label>
-      <input type="text" id="prompt" placeholder="Enter your prompt, e.g., 'describe the image'">
+      <textarea id="prompt" placeholder="Enter your prompt, e.g., 'describe the image'"></textarea>
     </div>
 
     <div class="input-group">
