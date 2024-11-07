@@ -383,7 +383,7 @@
         const formData = {};
 
         inputs.forEach(input => {
-          if (isInputNotAllowed()) { return; }
+          if (isInputNotAllowed(input)) { return; }
 
           if (input.type === 'checkbox' || input.type === 'radio') {
             formData[input.id || input.name] = input.checked;
@@ -404,7 +404,7 @@
         const inputs = document.querySelectorAll('input, select, textarea');
 
         inputs.forEach(input => {
-          if (isInputNotAllowed()) { return; }
+          if (isInputNotAllowed(input)) { return; }
 
           const identifier = input.id || input.name;
 
