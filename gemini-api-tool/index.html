@@ -136,7 +136,7 @@
 <body>
   <div class="container">
     <h1>Gemini API Text Generation</h1>
-    
+
     <div id="apiKeySection">
       <div class="input-group">
         <label for="apiKey">API Key</label>
@@ -172,13 +172,14 @@
       // Check and update API key status on page load
       document.addEventListener('DOMContentLoaded', function () {
         updateApiKeyStatus();
+        restoreFormValues();
       });
 
       function updateApiKeyStatus() {
         const apiKey = localStorage.getItem('geminiApiKey');
         const statusElement = document.getElementById('apiKeyStatus');
         const apiKeyInput = document.getElementById('apiKey');
-        
+
         if (apiKey) {
           statusElement.textContent = 'API Key is saved';
           statusElement.style.color = '#28a745';
@@ -211,6 +212,8 @@
         const apiKey = localStorage.getItem('geminiApiKey');
         const outputElement = document.getElementById('output');
 
+        saveInputsValues();
+
         if (!apiKey) {
           outputElement.textContent = 'Please save your API key first.';
           return;
@@ -225,13 +228,13 @@
 
         try {
           const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
-          
+
           const [mimeType, base64String] = await imageUrlToBase64(imageUrl);
           const requestBody = {
             contents: [{
               parts: [
                 { text: prompt },
-                { 
+                {
                   inlineData: {
                     mimeType,
                     data: base64String
@@ -255,7 +258,7 @@
           }
 
           const data = await response.json();
-          
+
           // Extract the text from the response
           if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
             const responseText = data.candidates[0].content.parts[0].text;
@@ -276,10 +279,10 @@
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
-          
+
           // Get the image as a blob
           const blob = await response.blob();
-          
+
           // Create a FileReader to read the blob
           return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -368,6 +371,51 @@
         });
 
         loadImage();
+      }
+
+      function isInputNotAllowed(input) {
+        return input.type === 'submit' || input.type === 'button' || input.type === 'password';
+      }
+
+      function saveInputsValues() {
+        const inputs = document.querySelectorAll('input, select, textarea');
+
+        const formData = {};
+
+        inputs.forEach(input => {
+          if (isInputNotAllowed()) { return; }
+
+          if (input.type === 'checkbox' || input.type === 'radio') {
+            formData[input.id || input.name] = input.checked;
+          } else {
+            formData[input.id || input.name] = input.value;
+          }
+        });
+        localStorage.setItem('formData', JSON.stringify(formData));
+      }
+
+      function restoreFormValues() {
+        const savedData = localStorage.getItem('formData');
+
+        if (!savedData) return;
+
+        const formData = JSON.parse(savedData);
+
+        const inputs = document.querySelectorAll('input, select, textarea');
+
+        inputs.forEach(input => {
+          if (isInputNotAllowed()) { return; }
+
+          const identifier = input.id || input.name;
+
+          if (formData.hasOwnProperty(identifier)) {
+            if (input.type === 'checkbox' || input.type === 'radio') {
+              input.checked = formData[identifier];
+            } else {
+              input.value = formData[identifier];
+            }
+          }
+        });
       }
     </script>
   </div>
