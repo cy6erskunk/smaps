@@ -4,7 +4,7 @@ small web apps co-created with LLMs
 
 ## Local development
 
-Serve the folder with a web server, e.g., `npx serve`, `python -m http 3000`.
+Serve the folder with a web server, e.g., `npx serve`, `python -m http.server 3000`.
 
 ## gemini-api-tool
 
