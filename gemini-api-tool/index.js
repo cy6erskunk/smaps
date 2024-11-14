@@ -41,6 +41,7 @@ function clearApiKey() {
 
 async function generateText() {
     const prompt = document.getElementById('prompt').value || 'describe the image';
+    const jsonPrompt = document.getElementById('json-prompt').value;
     const imageUrl = document.getElementById('imageUrl').value;
     const apiKey = localStorage.getItem('geminiApiKey');
     const outputElement = document.getElementById('output');
@@ -64,7 +65,7 @@ async function generateText() {
         const requestBody = {
             contents: [{
                 parts: [
-                    { text: prompt },
+                    { text: prompt + '\n' + jsonPrompt },
                     {
                         inlineData: {
                             mimeType,
