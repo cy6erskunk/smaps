@@ -148,7 +148,6 @@ function scaleAndRenderToCanvas(imageUrl) {
         img.crossOrigin = 'anonymous';  // Enable CORS for images from different domains
 
         img.onload = function () {
-            debugger;
             errorElement.style.display = 'none';
 
             // Get container width
