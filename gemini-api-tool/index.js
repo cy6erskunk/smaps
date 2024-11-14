@@ -94,7 +94,7 @@ async function generateText() {
         if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
             const responseText = data.candidates[0].content.parts[0].text;
             outputElement.textContent = responseText;
-            scaleAndRenderToCanvas(imageUrl);
+            processJsonInResponse(responseText, imageUrl);
         } else {
             throw new Error('Unexpected response format');
         }
@@ -105,14 +105,14 @@ async function generateText() {
 
 async function imageUrlToBase64(imageUrl) {
     try {
-        // Fetch the image
         const response = await fetch(imageUrl);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Get the image as a blob
-        const blob = await response.blob();
+        const pre_blob = await response.blob();
+        // render image to canvas to remove exif data
+        const blob = await renderBlobToCanvas(pre_blob);
 
         // Create a FileReader to read the blob
         return new Promise((resolve, reject) => {
@@ -132,75 +132,32 @@ async function imageUrlToBase64(imageUrl) {
     }
 }
 
-function scaleAndRenderToCanvas(imageUrl) {
+function renderBlobToCanvas(blob) {
     const canvas = document.getElementById('imageCanvas');
     const ctx = canvas.getContext('2d');
-    const container = document.querySelector('.canvas-container');
-    const errorElement = document.getElementById('error');
+    const imageUrl = URL.createObjectURL(blob);
 
-    if (!imageUrl) {
-        showError('Please enter an image URL');
-        return;
-    }
+    return new Promise((resolve, reject) => {
+        const image = new Image();
 
-    function loadImage() {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';  // Enable CORS for images from different domains
+        image.onload = () => {
+            canvas.width = image.width;
+            canvas.height = image.height;
+            ctx.drawImage(image, 0, 0);
 
-        img.onload = function () {
-            errorElement.style.display = 'none';
-
-            // Get container width
-            const containerWidth = container.clientWidth;
-
-            // Calculate scaling ratio
-            let scale = 1;
-            if (img.width > containerWidth) {
-                scale = containerWidth / img.width;
-            }
-
-            // Set canvas dimensions
-            canvas.width = img.width * scale;
-            canvas.height = img.height * scale;
-
-            // Clear previous content
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw scaled image
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            // Cleanup
+            URL.revokeObjectURL(imageUrl);
+            resolve(new Promise((innerResolve) => {
+                canvas.toBlob((blob) => {
+                    innerResolve(new File([blob], "compressed_image.jpg", { type: "image/jpeg" }));
+                }, 'image/jpeg', 1.0);
+            }));
         };
 
-        img.onerror = function () {
-            showError('Failed to load image. Please check the URL and try again.');
-            // Reset canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            canvas.width = 0;
-            canvas.height = 0;
-        };
+        image.onerror = reject;
 
-        // Start loading the image
-        img.src = imageUrl;
-    }
-
-    function showError(message) {
-        errorElement.textContent = message;
-        errorElement.style.display = 'block';
-    }
-
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const containerWidth = container.clientWidth;
-
-        if (canvas.width > containerWidth) {
-            const scale = containerWidth / canvas.width;
-            canvas.width = containerWidth;
-            canvas.height *= scale;
-            ctx.putImageData(img, 0, 0);
-        }
+        image.src = imageUrl;
     });
-
-    loadImage();
 }
 
 function isInputNotAllowed(input) {
@@ -245,5 +202,36 @@ function restoreFormValues() {
                 input.value = formData[identifier];
             }
         }
+    });
+}
+
+function processJsonInResponse(responseText, imageUrl) {
+    try {
+        // Find the start and end indices of the JSON content
+        const startIndex = responseText.indexOf('```json') + '```json'.length;
+        const endIndex = responseText.lastIndexOf('```');
+        const jsonContent = responseText.slice(startIndex, endIndex);
+        // Parse the JSON content
+        const jsonObject = JSON.parse(jsonContent);
+
+        renderBoundingBoxesOnCanvas(imageUrl, jsonObject);
+    } catch (error) {
+        console.log('Error parsing JSON:', error);
+    }
+}
+
+function renderBoundingBoxesOnCanvas(imageUrl, { items }) {
+    const canvas = document.getElementById('imageCanvas');
+    const ctx = canvas.getContext('2d');
+
+    items.forEach(area => {
+        ctx.beginPath();
+        ctx.rect(Math.round(area.x / 1000 * canvas.width),
+            Math.round(area.y / 1000 * canvas.height),
+            Math.round(area.width / 1000 * canvas.width),
+            Math.round(area.height / 1000 * canvas.height));
+        ctx.strokeStyle = 'green';
+        ctx.lineWidth = 2;
+        ctx.stroke();
     });
 }
