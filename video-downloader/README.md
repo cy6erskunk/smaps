@@ -3,5 +3,5 @@
 ```
 uv venv
 uv pip sync requirements.txt
-python app.py
+uv run ./app.py
 ```
