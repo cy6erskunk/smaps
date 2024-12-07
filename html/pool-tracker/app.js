@@ -267,11 +267,10 @@ class FencingPoolTracker {
                     matchInput.dataset.rowIndex = rowIndex;
                     matchInput.dataset.colIndex = colIndex;
 
-                    // Restore previous input value if it exists
-                    if (existingInputValues[rowIndex] && existingInputValues[rowIndex][colIndex]) {
-                        matchInput.value = existingInputValues[rowIndex][colIndex];
+                    const match = fencer.matches.find(m => m.opponent === opponent.name);
+                    if (match) {
+                        matchInput.value = `${match.result.fencerScore}-${match.result.opponentScore}`;
                     }
-
                     matchInput.addEventListener('change', this.updateMatchResult.bind(this));
                     matchCell.appendChild(matchInput);
                 }
