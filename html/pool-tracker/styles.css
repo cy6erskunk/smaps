@@ -40,3 +40,7 @@
     background-color: #fef3c7;
     color: #92400e;
 }
+
+::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}

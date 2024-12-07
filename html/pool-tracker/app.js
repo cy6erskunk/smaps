@@ -57,7 +57,10 @@ class FencingPoolTracker {
         this.updateTournamentsDropdown();
         // Event listeners for tournament management
         document.getElementById('saveTournamentBtn').addEventListener('click', () => this.saveTournament());
-        document.getElementById('loadTournamentBtn').addEventListener('click', () => this.loadTournament());
+        document.getElementById('loadTournamentBtn').addEventListener('click', () => {
+            this.loadTournament()
+            document.getElementById('loadsavepopover').hidePopover();
+        });
         document.getElementById('deleteTournamentBtn').addEventListener('click', () => this.deleteTournament());
         document.getElementById('tournamentSelect').addEventListener('change', () => this.updateDeleteButtonState());
     }
@@ -185,10 +188,6 @@ class FencingPoolTracker {
 
         alert('Tournament deleted successfully!');
     }
-
-    // Rest of the existing methods remain the same as in the original code...
-    // (addFencer, updateFencerList, updateMatchResult, updateResultSummary)
-    // ... [previous implementation would be here]
 
     addFencer(name) {
         // Check for duplicate names
