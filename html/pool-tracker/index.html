@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fencing Pool Score Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center py-8">
+    <div class="container bg-white shadow-md rounded-lg p-8 w-full max-w-4xl">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Fencing Pool Score Tracker</h1>
+
+        <div id="loadsavepopover" popover>
+            <div id="tournamentContainer" class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <h2 class="text-xl font-semibold mb-4">Tournament Management</h2>
+                        <div class="mb-4">
+                            <label for="tournamentName" class="block mb-2 text-sm font-medium">Tournament Name:</label>
+                            <input type="text" id="tournamentName"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Enter tournament name">
+                        </div>
+                        <button id="saveTournamentBtn"
+                            class="w-full mb-2 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300">
+                            Save Current Tournament
+                        </button>
+                    </div>
+
+                    <div>
+                        <h2 class="text-xl font-semibold mb-4">Saved Tournaments</h2>
+                        <select id="tournamentSelect"
+                            class="w-full p-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select a Tournament</option>
+                        </select>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="loadTournamentBtn"
+                                class="p-2 bg-green-600 text-white rounded-md hover:bg-green-600 transition duration-300">
+                                Load Tournament
+                            </button>
+                            <button id="deleteTournamentBtn"
+                                class="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300">
+                                Delete Tournament
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="fencerForm" class="mb-6 flex space-x-4 items-center">
+            <input type="text" id="fencerName" placeholder="Enter fencer name"
+                class="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="addFencerBtn"
+                class="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300">
+                Add Fencer
+            </button>
+            <button id="showManagementPopoverBtn" popovertarget="loadsavepopover"
+                class="p-2 bg-green-600 text-white rounded-md hover:bg-blue-600 transition duration-300">Load/save</button>
+        </div>
+
+        <div id="fencerList" class="mb-6">
+            <!-- Fencer matrix will be dynamically populated here -->
+        </div>
+
+        <div id="resultSummary" class="bg-gray-50 p-4 rounded-md">
+            <!-- Tournament results summary will be displayed here -->
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
