@@ -2,6 +2,10 @@
 
 small web apps co-created with LLMs
 
+## github pages deployments
+
+Simple client-side applications are deployed from the `html/` folder as gihub pages
+
 ## gemini-api-tool
 
 A tool a submit request to Gemini 1.5 API together with an image that is provided as an URL. 
