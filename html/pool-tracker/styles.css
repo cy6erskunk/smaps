@@ -1,0 +1,42 @@
+/* Custom styles for Fencing Pool Score Tracker */
+.fencer-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background-color: #f9fafb;
+    border-radius: 0.25rem;
+}
+
+.match-cell {
+    flex: 1;
+    text-align: center;
+    padding: 0.25rem;
+    border: 1px solid #e5e7eb;
+}
+
+.match-cell input {
+    width: 100%;
+    text-align: center;
+    border: none;
+    background-color: transparent;
+}
+
+.match-result {
+    font-weight: bold;
+}
+
+.win {
+    background-color: #d1fae5;
+    color: #064e3b;
+}
+
+.loss {
+    background-color: #fee2e2;
+    color: #7f1d1d;
+}
+
+.draw {
+    background-color: #fef3c7;
+    color: #92400e;
+}
