@@ -4,16 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fencing Pool Score Tracker</title>
+    <title>Pool Score Tracker</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body class="bg-gray-100 min-h-screen flex items-center justify-center py-8">
     <div class="container bg-white shadow-md rounded-lg p-8 w-full max-w-4xl">
-        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Fencing Pool Score Tracker</h1>
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Pool Score Tracker</h1>
 
         <div id="loadsavepopover" popover>
+            <div class="text-right bg-gray-50 absolute top-2 right-2">
+                <button popovertarget="loadsavepopover" popovertargetaction="hide">❌</button>
+            </div>
             <div id="tournamentContainer" class="mb-6 p-4 bg-gray-50 rounded-lg">
                 <div class="grid md:grid-cols-2 gap-4">
                     <div>
@@ -58,16 +61,22 @@
                 class="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300">
                 Add Fencer
             </button>
-            <button id="showManagementPopoverBtn" popovertarget="loadsavepopover"
-                class="p-2 bg-green-600 text-white rounded-md hover:bg-blue-600 transition duration-300">Load/save</button>
         </div>
 
         <div id="fencerList" class="mb-6">
             <!-- Fencer matrix will be dynamically populated here -->
         </div>
 
-        <div id="resultSummary" class="bg-gray-50 p-4 rounded-md">
+        <div id="resultSummary" class="bg-gray-50 p-4 mb-6 rounded-md">
             <!-- Tournament results summary will be displayed here -->
+            <p>
+                Use this app to track results of a fencing pool. Add fencers to the pool, then record the results of
+                each bout. The app will calculate the total number of wins and points for each fencer.
+            </p>
+        </div>
+        <div class="mb-4 text-right">
+            <button id="showManagementPopoverBtn" popovertarget="loadsavepopover"
+                class="p-2 bg-green-600 text-white rounded-md hover:bg-blue-600 transition duration-300">Load/save</button>
         </div>
     </div>
 
