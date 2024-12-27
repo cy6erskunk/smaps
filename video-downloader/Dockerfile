@@ -10,6 +10,7 @@ COPY requirements.txt ./
 RUN .venv/bin/pip install -r requirements.txt
 FROM python:3.13.1-slim
 WORKDIR /app
+RUN apt-get update && apt-get install -y ffmpeg
 COPY --from=builder /app/.venv .venv/
 COPY . .
 CMD ["/app/.venv/bin/flask", "run", "--host=0.0.0.0", "--port=8080"]
