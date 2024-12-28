@@ -11,21 +11,19 @@ class FencingPoolTracker {
         const addFencerBtn = document.getElementById('addFencerBtn');
         const fencerNameInput = document.getElementById('fencerName');
 
-        addFencerBtn.addEventListener('click', () => {
+        const handleFencerNameInput = () => {
             const name = fencerNameInput.value.trim();
             if (name) {
                 this.addFencer(name);
                 fencerNameInput.value = ''; // Clear input
             }
-        });
+        }
+
+        addFencerBtn.addEventListener('click', handleFencerNameInput);
 
         fencerNameInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                const name = fencerNameInput.value.trim();
-                if (name) {
-                    this.addFencer(name);
-                    fencerNameInput.value = ''; // Clear input
-                }
+                handleFencerNameInput();
             }
         });
     }
