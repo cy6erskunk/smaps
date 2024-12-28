@@ -22,6 +22,7 @@ class FencingPoolTracker {
     initializeEventListeners() {
         const addFencerBtn = document.getElementById('addFencerBtn');
         const fencerNameInput = document.getElementById('fencerName');
+        const clearTournamentBtn = document.getElementById('clearTournamentBtn');
 
         const handleFencerNameInput = () => {
             const name = fencerNameInput.value.trim();
@@ -36,6 +37,14 @@ class FencingPoolTracker {
         fencerNameInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 handleFencerNameInput();
+            }
+        });
+
+        clearTournamentBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear the current tournament?')) {
+                this.setFencers([]);
+                this.updateFencerList();
+                this.tournaments.updateCurrentTournament();
             }
         });
     }
