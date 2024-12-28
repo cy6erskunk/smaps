@@ -7,6 +7,7 @@ class FencingPoolTracker {
             // Update the UI
             this.updateFencerList();
         });
+        this.tournaments.loadCurrentTournament();
         this.initializeEventListeners();
     }
 
@@ -58,6 +59,7 @@ class FencingPoolTracker {
 
         this.fencers.push(fencer);
         this.updateFencerList();
+        this.tournaments.updateCurrentTournament();
     }
 
     updateFencerList() {
@@ -245,6 +247,7 @@ class FencingPoolTracker {
         ).length;
 
         this.updateFencerList();
+        this.tournaments.updateCurrentTournament();
     }
 
     updateResultSummary() {

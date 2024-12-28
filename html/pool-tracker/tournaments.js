@@ -44,6 +44,25 @@ export class Tournaments {
         document.getElementById('tournamentSelect').addEventListener('change', () => this.updateDeleteButtonState());
     }
 
+    loadCurrentTournament() {
+        this._loadTournament('_current');
+    }
+
+    updateCurrentTournament() {
+        const tournament = this.tournaments.find(t => t.id === '_current');
+        if (tournament) {
+            tournament.fencers = this.getFencers();
+        } else {
+            const currentTournament = {
+                id: '_current',
+                date: new Date().toISOString(),
+                fencers: this.getFencers()
+            };
+            this.tournaments.push(currentTournament);
+        }
+        this._saveTournaments();
+    }
+
     saveTournament() {
         const tournamentNameInput = document.getElementById('tournamentName');
         const tournamentName = tournamentNameInput.value.trim();
@@ -70,8 +89,7 @@ export class Tournaments {
         this.tournaments.push(tournament);
         this.currentTournamentId = tournament.id;
 
-        // Save to local storage
-        localStorage.setItem('fencingTournaments', JSON.stringify(this.tournaments));
+        this._saveTournaments();
 
         // Update tournaments dropdown
         this.updateTournamentsDropdown();
@@ -80,6 +98,11 @@ export class Tournaments {
         tournamentNameInput.value = '';
 
         alert('Tournament saved successfully!');
+    }
+
+    _saveTournaments() {
+        // Save to local storage
+        localStorage.setItem('fencingTournaments', JSON.stringify(this.tournaments));
     }
 
     loadTournaments() {
@@ -100,7 +123,7 @@ export class Tournaments {
         tournamentSelect.innerHTML = '<option value="">Select a Tournament</option>';
 
         // Add tournaments to dropdown
-        this.tournaments.forEach(t => {
+        this.tournaments.filter(t => t.id !== '_current').forEach(t => {
             const option = document.createElement('option');
             option.value = t.id;
             option.textContent = `${t.name} (${new Date(t.date).toLocaleString()})`;
@@ -117,18 +140,22 @@ export class Tournaments {
             return;
         }
 
+        this._loadTournament(selectedTournamentId);
+    }
+
+    _loadTournament(tournamentId) {
         // Find the selected tournament
-        const tournament = this.tournaments.find(t => t.id === selectedTournamentId);
+        const tournament = this.tournaments.find(t => t.id === tournamentId);
 
         if (!tournament) {
-            alert('Tournament not found');
             return;
         }
 
         // Reset current state
         this.setFencers(structuredClone(tournament.fencers));
         this.getFencers();
-        this.currentTournamentId = selectedTournamentId;
+        this.updateCurrentTournament();
+        this.currentTournamentId = tournamentId;
     }
 
     deleteTournament() {
