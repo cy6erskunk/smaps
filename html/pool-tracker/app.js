@@ -276,33 +276,20 @@ class FencingPoolTracker {
         });
 
         // Create summary table
-        const summaryTable = document.createElement('table');
-        summaryTable.classList.add('w-full', 'text-sm');
-        summaryTable.innerHTML = `
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="p-2 text-left">Rank</th>
-                    <th class="p-2 text-left">Fencer</th>
-                    <th class="p-2 text-center">V</th>
-                    <th class="p-2 text-center">D</th>
-                    <th class="p-2 text-center">Points</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${sortedFencers.map((fencer, index) => `
-                    <tr class="${index % 2 ? 'bg-gray-50' : ''}">
-                        <td class="p-2">${index + 1}</td>
-                        <td class="p-2">${fencer.name}</td>
-                        <td class="p-2 text-center">${fencer.victories}</td>
-                        <td class="p-2 text-center">${fencer.defeats}</td>
-                        <td class="p-2 text-center">${fencer.pointsScored}-${fencer.pointsReceived}</td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        `;
-
+        const summaryTableTemplate = document.getElementById('summaryTableTemplate');
+        const summaryTableContent = summaryTableTemplate.content.cloneNode(true);
+        const summaryTableBody = summaryTableContent.getElementById('summaryTableTemplateBody');
+        summaryTableBody.innerHTML = sortedFencers.map((fencer, index) => `
+            <tr class="${index % 2 ? 'bg-gray-50' : ''}">
+                <td class="p-2">${index + 1}</td>
+                <td class="p-2">${fencer.name}</td>
+                <td class="p-2 text-center">${fencer.victories}</td>
+                <td class="p-2 text-center">${fencer.defeats}</td>
+                <td class="p-2 text-center">${fencer.pointsScored}-${fencer.pointsReceived}</td>
+            </tr>
+        `).join('');
         resultSummaryEl.innerHTML = '';
-        resultSummaryEl.appendChild(summaryTable);
+        resultSummaryEl.appendChild(summaryTableContent);
     }
 }
 

@@ -82,6 +82,23 @@
         </div>
     </div>
 
+    <template id="summaryTableTemplate">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="p-2 text-left">Rank</th>
+                    <th class="p-2 text-left">Fencer</th>
+                    <th class="p-2 text-center">V</th>
+                    <th class="p-2 text-center">D</th>
+                    <th class="p-2 text-center">Points</th>
+                </tr>
+            </thead>
+            <tbody id="summaryTableTemplateBody">
+                <!-- Fencer results will be dynamically populated here -->
+            </tbody>
+        </table>
+    </template>
+
     <script src="app.js" type="module"></script>
 </body>
 
