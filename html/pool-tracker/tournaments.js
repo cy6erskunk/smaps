@@ -10,31 +10,8 @@ export class Tournaments {
     }
 
     setupTournamentManagement() {
-        const tournamentContainer = document.getElementById('tournamentContainer');
-        if (!tournamentContainer) {
-            const container = document.createElement('div');
-            container.id = 'tournamentContainer';
-            container.innerHTML = `
-                <div class="mb-4">
-                    <label for="tournamentName" class="block mb-2">Tournament Name:</label>
-                    <input type="text" id="tournamentName" class="w-full p-2 border rounded">
-                    <button id="saveTournamentBtn" class="mt-2 p-2 bg-blue-500 text-white rounded">Save Tournament</button>
-                </div>
-                <div id="savedTournaments" class="mt-4">
-                    <h3 class="font-bold mb-2">Saved Tournaments:</h3>
-                    <select id="tournamentSelect" class="w-full p-2 border rounded">
-                    </select>
-                    <button id="loadTournamentBtn" class="mt-2 p-2 bg-green-500 text-white rounded">Load Tournament</button>
-                    <button id="deleteTournamentBtn" class="mt-2 p-2 bg-red-500 text-white rounded">Delete Tournament</button>
-                </div>
-            `;
-
-            document.getElementById('fencerForm').insertAdjacentElement('beforebegin', container);
-
-        }
-        // Update tournaments dropdown
         this.updateTournamentsDropdown();
-        // Event listeners for tournament management
+
         document.getElementById('saveTournamentBtn').addEventListener('click', () => this.saveTournament());
         document.getElementById('loadTournamentBtn').addEventListener('click', () => {
             this.loadTournament()
