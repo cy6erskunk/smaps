@@ -88,69 +88,61 @@ class FencingPoolTracker {
             });
         }
 
-        fencerListEl.innerHTML = ''; // Clear existing list
+        fencerListEl.innerHTML = '';
 
-        // Create headers
-        const headerRow = document.createElement('div');
-        headerRow.classList.add('flex', 'mb-2', 'font-bold');
-        headerRow.innerHTML = `
-            <div class="flex-1 text-left">Fencer</div>
-            ${this.fencers.map((_, index) =>
-            `<div class="flex-1 text-center">${index + 1}</div>`
-        ).join('')}
-            <div class="flex-1 text-right">Results</div>
-        `;
-        fencerListEl.appendChild(headerRow);
+        if (this.fencers.length > 0) {
+            const headerRow = document.getElementById("fencersListHeaderTemplate").content.cloneNode(true);
 
-        // Create match matrix
-        this.fencers.forEach((fencer, rowIndex) => {
-            const fencerRow = document.createElement('div');
-            fencerRow.classList.add('fencer-row');
-
-            // Fencer name
-            const nameCell = document.createElement('div');
-            nameCell.classList.add('flex-1', 'text-left');
-            nameCell.textContent = fencer.name;
-            fencerRow.appendChild(nameCell);
-
-            // Match cells
-            this.fencers.forEach((opponent, colIndex) => {
-                const matchCell = document.createElement('div');
-                matchCell.classList.add('match-cell');
-
-                // Prevent matches against self
-                if (rowIndex === colIndex) {
-                    matchCell.textContent = '-';
-                } else {
-                    const matchInput = document.createElement('input');
-                    matchInput.type = 'text';
-                    matchInput.placeholder = '5-3';
-                    matchInput.dataset.rowIndex = rowIndex;
-                    matchInput.dataset.colIndex = colIndex;
-
-                    const match = fencer.matches.find(m => m.opponent === opponent.name);
-                    if (match) {
-                        matchInput.value = `${match.result.fencerScore}-${match.result.opponentScore}`;
-                    }
-                    matchInput.addEventListener('change', this.updateMatchResult.bind(this));
-                    matchCell.appendChild(matchInput);
-                }
-
-                fencerRow.appendChild(matchCell);
+            this.fencers.forEach((_, index) => {
+                const headerItemTemplate = document.getElementById("fencersListHeaderItemTemplate").content.cloneNode(true);
+                headerItemTemplate.querySelector('.header-item').textContent = index + 1;
+                headerRow.querySelector(".header-row").insertBefore(headerItemTemplate, headerRow.querySelector(".results-cell"));
             });
+            fencerListEl.appendChild(headerRow);
 
-            // Results cell
-            const resultsCell = document.createElement('div');
-            resultsCell.classList.add('flex-1', 'text-right', 'match-result');
+            // Create match matrix
+            this.fencers.forEach((fencer, rowIndex) => {
+                const fencerRowWrapper = document.getElementById('fencerRowTemplate').content.cloneNode(true);
+                const fencerRow = fencerRowWrapper.querySelector('.fencer-row');
+                fencerRow.querySelector('.fencer-name').textContent = fencer.name;
 
-            // Calculate and display results
-            const resultsText = `${fencer.victories}-${fencer.defeats} (${fencer.pointsScored}-${fencer.pointsReceived})`;
-            resultsCell.textContent = resultsText;
+                // Match cells
+                this.fencers.forEach((opponent, colIndex) => {
 
-            fencerRow.appendChild(resultsCell);
+                    const matchCellWrapper = document.getElementById('matchCellTemplate').content.cloneNode(true);
+                    const matchCell = matchCellWrapper.querySelector('.match-cell');
 
-            fencerListEl.appendChild(fencerRow);
-        });
+                    // Prevent matches against self
+                    if (rowIndex === colIndex) {
+                        matchCell.textContent = '-';
+                    } else {
+                        const matchInputWrapper = document.getElementById('matchCellInputTemplate').content.cloneNode(true);
+                        const matchInput = matchInputWrapper.querySelector('input');
+                        matchInput.dataset.rowIndex = rowIndex;
+                        matchInput.dataset.colIndex = colIndex;
+
+                        const match = fencer.matches.find(m => m.opponent === opponent.name);
+                        if (match) {
+                            matchInput.value = `${match.result.fencerScore}-${match.result.opponentScore}`;
+                        }
+                        matchInput.addEventListener('change', this.updateMatchResult.bind(this));
+                        matchCell.appendChild(matchInput);
+                    }
+
+                    fencerRow.appendChild(matchCellWrapper);
+                });
+
+                const resultsCell = document.getElementById('fencerResultCellTemplate').content.cloneNode(true);
+
+                // Calculate and display results
+                const resultsText = `${(fencer.victories / (fencer.victories + fencer.defeats)).toFixed(2)
+                    } (${fencer.pointsScored > fencer.pointsReceived ? '+' : ''}${fencer.pointsScored - fencer.pointsReceived})`;
+                resultsCell.querySelector('.match-result').textContent = resultsText;
+
+                fencerRow.appendChild(resultsCell);
+                fencerListEl.appendChild(fencerRow);
+            });
+        }
 
         this.updateResultSummary();
     }
@@ -261,48 +253,41 @@ class FencingPoolTracker {
 
     updateResultSummary() {
         const resultSummaryEl = document.getElementById('resultSummary');
-
-        // Sort fencers by victories, then by point difference
-        const sortedFencers = [...this.fencers].sort((a, b) => {
-            // First sort by victories (descending)
-            if (b.victories !== a.victories) {
-                return b.victories - a.victories;
-            }
-
-            // If victories are equal, sort by point difference
-            const aDiff = a.pointsScored - a.pointsReceived;
-            const bDiff = b.pointsScored - b.pointsReceived;
-            return bDiff - aDiff;
-        });
-
-        // Create summary table
-        const summaryTable = document.createElement('table');
-        summaryTable.classList.add('w-full', 'text-sm');
-        summaryTable.innerHTML = `
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="p-2 text-left">Rank</th>
-                    <th class="p-2 text-left">Fencer</th>
-                    <th class="p-2 text-center">V</th>
-                    <th class="p-2 text-center">D</th>
-                    <th class="p-2 text-center">Points</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${sortedFencers.map((fencer, index) => `
-                    <tr class="${index % 2 ? 'bg-gray-50' : ''}">
-                        <td class="p-2">${index + 1}</td>
-                        <td class="p-2">${fencer.name}</td>
-                        <td class="p-2 text-center">${fencer.victories}</td>
-                        <td class="p-2 text-center">${fencer.defeats}</td>
-                        <td class="p-2 text-center">${fencer.pointsScored}-${fencer.pointsReceived}</td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        `;
-
         resultSummaryEl.innerHTML = '';
-        resultSummaryEl.appendChild(summaryTable);
+
+        if (this.fencers.length === 0) {
+            document.getElementById('infoMessage').classList.remove('hidden');
+        } else {
+            document.getElementById('infoMessage').classList.add('hidden');
+
+            // Sort fencers by victories, then by point difference
+            const sortedFencers = [...this.fencers].sort((a, b) => {
+                // First sort by victories (descending)
+                if (b.victories !== a.victories) {
+                    return b.victories - a.victories;
+                }
+
+                // If victories are equal, sort by point difference
+                const aDiff = a.pointsScored - a.pointsReceived;
+                const bDiff = b.pointsScored - b.pointsReceived;
+                return bDiff - aDiff;
+            });
+
+            const summaryTableContent = document.getElementById('summaryTableTemplate').content.cloneNode(true);
+            const summaryTableBody = summaryTableContent.getElementById('summaryTableBody');
+
+            sortedFencers.forEach((fencer, index) => {
+                const rowTemplate = document.getElementById('summaryTableRowTemplate').content.cloneNode(true);
+                rowTemplate.querySelector('.result-rank').textContent = index + 1;
+                rowTemplate.querySelector('.result-name').textContent = fencer.name;
+                rowTemplate.querySelector('.result-victories').textContent = fencer.victories;
+                rowTemplate.querySelector('.result-defeats').textContent = fencer.defeats;
+                rowTemplate.querySelector('.result-points').textContent = `${fencer.pointsScored} -${fencer.pointsReceived} `;
+                summaryTableBody.appendChild(rowTemplate);
+            });
+
+            resultSummaryEl.appendChild(summaryTableContent);
+        }
     }
 }
 

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pool Score Tracker</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -63,24 +63,81 @@
             </button>
         </div>
 
+        <p id="infoMessage" class="bg-gray-50 p-4">
+            Use this app to track results of a fencing pool. Add fencers to the pool, then record the results of
+            each bout. The app will calculate the total number of wins and points for each fencer.
+        </p>
+
         <div id="fencerList" class="mb-6">
             <!-- Fencer matrix will be dynamically populated here -->
         </div>
 
-        <div id="resultSummary" class="bg-gray-50 p-4 mb-6 rounded-md">
+        <div id="resultSummary" class="mb-6 rounded-md">
             <!-- Tournament results summary will be displayed here -->
-            <p>
-                Use this app to track results of a fencing pool. Add fencers to the pool, then record the results of
-                each bout. The app will calculate the total number of wins and points for each fencer.
-            </p>
         </div>
         <div class="mb-4 text-right">
             <button id="clearTournamentBtn"
-                class="p-2 bg-green-600 text-white rounded-md hover:bg-blue-600 transition duration-300">Clear</button>
+                class="p-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300">Clear</button>
             <button id="showManagementPopoverBtn" popovertarget="loadsavepopover"
-                class="p-2 bg-green-600 text-white rounded-md hover:bg-blue-600 transition duration-300">Load/save</button>
+                class="p-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300">Load/save</button>
         </div>
     </div>
+
+    <template id="summaryTableTemplate">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="p-2 text-left">Rank</th>
+                    <th class="p-2 text-left">Fencer</th>
+                    <th class="p-2 text-center">V</th>
+                    <th class="p-2 text-center">D</th>
+                    <th class="p-2 text-center">Points</th>
+                </tr>
+            </thead>
+            <tbody id="summaryTableBody">
+                <!-- Fencer results will be dynamically populated here -->
+            </tbody>
+        </table>
+    </template>
+
+    <template id="summaryTableRowTemplate">
+        <tr class="odd:bg-white even:bg-gray-50">
+            <td class="p-2 result-rank"></td>
+            <td class="p-2 result-name"></td>
+            <td class="p-2 text-center result-victories"></td>
+            <td class="p-2 text-center result-defeats"></td>
+            <td class="p-2 text-center result-points"></td>
+        </tr>
+    </template>
+
+    <template id="fencersListHeaderTemplate">
+        <div class="flex mb-2 font-bold header-row">
+            <div class="flex-1 text-left first-cell">Fencer</div>
+            <div class="flex-1 text-right results-cell">Results</div>
+        </div>
+    </template>
+
+    <template id="fencersListHeaderItemTemplate">
+        <div class="flex-1 text-center header-item"></div>
+    </template>
+
+    <template id="fencerRowTemplate">
+        <div class="fencer-row">
+            <div class="flex-1 text-left fencer-name"></div>
+        </div>
+    </template>
+
+    <template id="matchCellTemplate">
+        <div class="match-cell"></div>
+    </template>
+
+    <template id="matchCellInputTemplate">
+        <input type="text" placeholder="5-3" />
+    </template>
+
+    <template id="fencerResultCellTemplate">
+        <div class="flex-1 text-right match-result"></div>
+    </template>
 
     <script src="app.js" type="module"></script>
 </body>
