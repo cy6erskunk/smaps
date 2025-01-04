@@ -135,7 +135,8 @@ class FencingPoolTracker {
                 const resultsCell = document.getElementById('fencerResultCellTemplate').content.cloneNode(true);
 
                 // Calculate and display results
-                const resultsText = `${fencer.victories}-${fencer.defeats} (${fencer.pointsScored}-${fencer.pointsReceived})`;
+                const resultsText = `${(fencer.victories / (fencer.victories + fencer.defeats)).toFixed(2)
+                    } (${fencer.pointsScored > fencer.pointsReceived ? '+' : ''}${fencer.pointsScored - fencer.pointsReceived})`;
                 resultsCell.querySelector('.match-result').textContent = resultsText;
 
                 fencerRow.appendChild(resultsCell);
@@ -281,7 +282,7 @@ class FencingPoolTracker {
                 rowTemplate.querySelector('.result-name').textContent = fencer.name;
                 rowTemplate.querySelector('.result-victories').textContent = fencer.victories;
                 rowTemplate.querySelector('.result-defeats').textContent = fencer.defeats;
-                rowTemplate.querySelector('.result-points').textContent = `${fencer.pointsScored}-${fencer.pointsReceived}`;
+                rowTemplate.querySelector('.result-points').textContent = `${fencer.pointsScored} -${fencer.pointsReceived} `;
                 summaryTableBody.appendChild(rowTemplate);
             });
 
