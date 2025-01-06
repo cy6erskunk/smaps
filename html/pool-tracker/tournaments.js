@@ -74,7 +74,21 @@ export class Tournaments {
         // Clear tournament name input
         tournamentNameInput.value = '';
 
-        alert('Tournament saved successfully!');
+        const label = document.querySelector('label[for="tournamentName"]');
+        const successMsg = document.createElement('span');
+        successMsg.textContent = ' saved successfully!';
+        successMsg.className = 'text-green-600 text-sm text-right';
+        label.appendChild(successMsg);
+
+        // Remove message when popup closes
+        document.getElementById('loadsavepopover').addEventListener('beforetoggle', () => {
+            successMsg.remove();
+        }, { once: true });
+
+        // Remove message when input gets focus
+        tournamentNameInput.addEventListener('focus', () => {
+            successMsg.remove();
+        }, { once: true });
     }
 
     _saveTournaments() {
