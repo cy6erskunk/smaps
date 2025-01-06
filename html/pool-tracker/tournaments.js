@@ -173,10 +173,10 @@ export class Tournaments {
         this.updateTournamentsDropdown();
 
         // Reset current tournament if it was the deleted one
+        // Would it make sense NOT to reset the fencers here?
         if (this.currentTournamentId === selectedTournamentId) {
             this.currentTournamentId = null;
-            this.fencers = [];
-            this.updateFencerList();
+            this.setFencers([]);
         }
 
         alert('Tournament deleted successfully!');
