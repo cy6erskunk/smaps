@@ -15,9 +15,10 @@
 
         <div id="loadsavepopover" popover>
             <div class="text-right bg-gray-50 absolute top-2 right-2">
-                <button popovertarget="loadsavepopover" popovertargetaction="hide">❌</button>
+                <button popovertarget="loadsavepopover" popovertargetaction="hide"
+                    class="hover:bg-gray-200 p-1 rounded transition-colors duration-200">❌</button>
             </div>
-            <div id="tournamentContainer" class="mb-6 p-4 bg-gray-50 rounded-lg">
+            <div id="tournamentContainer" class="p-4 bg-gray-50 rounded-lg">
                 <div class="grid md:grid-cols-2 gap-4">
                     <div>
                         <h2 class="text-xl font-semibold mb-4">Tournament Management</h2>
@@ -41,7 +42,7 @@
                         </select>
                         <div class="grid grid-cols-2 gap-2">
                             <button id="loadTournamentBtn"
-                                class="p-2 bg-green-600 text-white rounded-md hover:bg-green-600 transition duration-300">
+                                class="p-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300">
                                 Load Tournament
                             </button>
                             <button id="deleteTournamentBtn"
