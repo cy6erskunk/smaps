@@ -74,7 +74,21 @@ export class Tournaments {
         // Clear tournament name input
         tournamentNameInput.value = '';
 
-        alert('Tournament saved successfully!');
+        const label = document.querySelector('label[for="tournamentName"]');
+        const successMsg = document.createElement('span');
+        successMsg.textContent = ' saved successfully!';
+        successMsg.className = 'text-green-600 text-sm text-right';
+        label.appendChild(successMsg);
+
+        // Remove message when popup closes
+        document.getElementById('loadsavepopover').addEventListener('beforetoggle', () => {
+            successMsg.remove();
+        }, { once: true });
+
+        // Remove message when input gets focus
+        tournamentNameInput.addEventListener('focus', () => {
+            successMsg.remove();
+        }, { once: true });
     }
 
     _saveTournaments() {
@@ -159,10 +173,10 @@ export class Tournaments {
         this.updateTournamentsDropdown();
 
         // Reset current tournament if it was the deleted one
+        // Would it make sense NOT to reset the fencers here?
         if (this.currentTournamentId === selectedTournamentId) {
             this.currentTournamentId = null;
-            this.fencers = [];
-            this.updateFencerList();
+            this.setFencers([]);
         }
 
         alert('Tournament deleted successfully!');
