@@ -13,6 +13,7 @@
         }
 
         input,
+        textarea,
         button {
             width: 100%;
             padding: 10px;
@@ -65,9 +66,9 @@
 </head>
 
 <body>
-    <h1>YouTube Video Downloader</h1>
+    <h1>Video Downloader</h1>
     <form method="POST" action="/">
-        <input type="url" name="url" placeholder="Enter YouTube URL" required>
+        <textarea name="urls" placeholder="Enter URLs (one per line)" rows="5" required></textarea>
         <button type="submit">Download Video</button>
     </form>
 
