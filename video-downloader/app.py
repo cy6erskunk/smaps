@@ -20,16 +20,17 @@ def get_video_files():
     for file in os.listdir(DOWNLOAD_DIR):
         file_path = os.path.join(DOWNLOAD_DIR, file)
         if os.path.isfile(file_path) and os.path.splitext(file)[1].lower() in video_extensions:
-            # Get file modification time and format as date
-            mod_time = os.path.getmtime(file_path)
-            date_str = datetime.fromtimestamp(mod_time).strftime("%Y-%m-%d")
+            # Get file creation time (date added) and format as date
+            stat_info = os.stat(file_path)
+            creation_time = stat_info.st_birthtime if hasattr(stat_info, 'st_birthtime') else stat_info.st_ctime
+            date_str = datetime.fromtimestamp(creation_time).strftime("%Y-%m-%d")
             
             video_info = {
                 "filename": file,
                 "size": f"{os.path.getsize(file_path) / (1024*1024):.2f}",
                 "path": file_path,
                 "date": date_str,
-                "timestamp": mod_time
+                "timestamp": creation_time
             }
             videos_by_date[date_str].append(video_info)
     
