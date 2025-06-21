@@ -4,6 +4,7 @@ from datetime import datetime
 from collections import defaultdict
 from flask import Flask, render_template, request, send_file, redirect, url_for
 import yt_dlp
+import html
 
 app = Flask(__name__)
 
@@ -80,7 +81,7 @@ def download_video():
             if len(downloaded_videos) == 1:
                 message = f'Video "{downloaded_videos[0]}" downloaded successfully!'
             else:
-                items_html = "".join(f"<li>{title}</li>" for title in downloaded_videos)
+                items_html = "".join(f"<li>{html.escape(title)}</li>" for title in downloaded_videos)
                 message = (
                     f"Successfully downloaded {len(downloaded_videos)} videos:"
                     f"<ul>{items_html}</ul>"
