@@ -62,6 +62,11 @@
             background-color: #f44336;
             color: white;
         }
+
+        .date-row {
+            background-color: #e9ecef;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -78,8 +83,6 @@
 
     {% if videos_by_date %}
     <h2>Downloaded Videos</h2>
-    {% for date, videos in videos_by_date.items() %}
-    <h3>{{ date }}</h3>
     <table>
         <thead>
             <tr>
@@ -89,6 +92,10 @@
             </tr>
         </thead>
         <tbody>
+            {% for date, videos in videos_by_date.items() %}
+            <tr class="date-row">
+                <td colspan="3">{{ date }}</td>
+            </tr>
             {% for video in videos %}
             <tr>
                 <td>{{ video.filename }}</td>
@@ -100,9 +107,9 @@
                 </td>
             </tr>
             {% endfor %}
+            {% endfor %}
         </tbody>
     </table>
-    {% endfor %}
     {% endif %}
 </body>
 
