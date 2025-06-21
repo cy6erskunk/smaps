@@ -1,5 +1,7 @@
 import os
 import shutil
+from datetime import datetime
+from collections import defaultdict
 from flask import Flask, render_template, request, send_file, redirect, url_for
 import yt_dlp
 
@@ -11,18 +13,33 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 
 def get_video_files():
-    """Get a list of video files in the downloads directory."""
+    """Get a list of video files in the downloads directory grouped by date."""
     video_extensions = [".mp4", ".mkv", ".avi", ".webm"]
-    return [
-        {
-            "filename": file,
-            "size": f"{os.path.getsize(os.path.join(DOWNLOAD_DIR, file)) / (1024*1024):.2f} MB",
-            "path": os.path.join(DOWNLOAD_DIR, file),
-        }
-        for file in os.listdir(DOWNLOAD_DIR)
-        if os.path.isfile(os.path.join(DOWNLOAD_DIR, file))
-        and os.path.splitext(file)[1].lower() in video_extensions
-    ]
+    videos_by_date = defaultdict(list)
+    
+    for file in os.listdir(DOWNLOAD_DIR):
+        file_path = os.path.join(DOWNLOAD_DIR, file)
+        if os.path.isfile(file_path) and os.path.splitext(file)[1].lower() in video_extensions:
+            # Get file creation time (date added) and format as date
+            stat_info = os.stat(file_path)
+            creation_time = stat_info.st_birthtime if hasattr(stat_info, 'st_birthtime') else stat_info.st_ctime
+            date_str = datetime.fromtimestamp(creation_time).strftime("%Y-%m-%d")
+            
+            video_info = {
+                "filename": file,
+                "size": f"{os.path.getsize(file_path) / (1024*1024):.2f}",
+                "path": file_path,
+                "date": date_str,
+                "timestamp": creation_time
+            }
+            videos_by_date[date_str].append(video_info)
+    
+    # Sort dates in descending order (newest first)
+    # Sort videos within each date by timestamp (newest first)
+    for date_videos in videos_by_date.values():
+        date_videos.sort(key=lambda x: x["timestamp"], reverse=True)
+    
+    return dict(sorted(videos_by_date.items(), reverse=True))
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -53,10 +70,10 @@ def download_video():
         except Exception as e:
             message = f"Error downloading video: {str(e)}"
 
-    # Get list of downloaded videos
-    videos = get_video_files()
+    # Get list of downloaded videos grouped by date
+    videos_by_date = get_video_files()
 
-    return render_template("index.html", message=message, videos=videos)
+    return render_template("index.html", message=message, videos_by_date=videos_by_date)
 
 
 @app.route("/download/<filename>")

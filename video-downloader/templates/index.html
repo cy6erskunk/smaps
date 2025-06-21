@@ -75,13 +75,15 @@
     <div id="status">{{ message }}</div>
     {% endif %}
 
-    {% if videos %}
+    {% if videos_by_date %}
     <h2>Downloaded Videos</h2>
+    {% for date, videos in videos_by_date.items() %}
+    <h3>{{ date }}</h3>
     <table>
         <thead>
             <tr>
                 <th>Filename</th>
-                <th>Size</th>
+                <th>Size (MB)</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -89,7 +91,7 @@
             {% for video in videos %}
             <tr>
                 <td>{{ video.filename }}</td>
-                <td>{{ video.size }} MB</td>
+                <td>{{ video.size }}</td>
                 <td class="actions">
                     <a href="{{ url_for('download_file', filename=video.filename) }}" class="download">Download</a>
                     <a href="{{ url_for('delete_file', filename=video.filename) }}" class="delete"
@@ -99,6 +101,7 @@
             {% endfor %}
         </tbody>
     </table>
+    {% endfor %}
     {% endif %}
 </body>
 
