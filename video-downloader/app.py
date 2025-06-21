@@ -80,8 +80,11 @@ def download_video():
             if len(downloaded_videos) == 1:
                 message = f'Video "{downloaded_videos[0]}" downloaded successfully!'
             else:
-                titles = ", ".join(f'"{title}"' for title in downloaded_videos)
-                message = f"Successfully downloaded {len(downloaded_videos)} videos: {titles}"
+                items_html = "".join(f"<li>{title}</li>" for title in downloaded_videos)
+                message = (
+                    f"Successfully downloaded {len(downloaded_videos)} videos:"
+                    f"<ul>{items_html}</ul>"
+                )
         elif downloaded_videos and failed_videos:
             video_word = "video" if len(downloaded_videos) == 1 else "videos"
             failed_word = "video" if len(failed_videos) == 1 else "videos"

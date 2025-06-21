@@ -73,7 +73,7 @@
     </form>
 
     {% if message %}
-    <div id="status">{{ message }}</div>
+    <div id="status">{{ message|safe }}</div>
     {% endif %}
 
     {% if videos_by_date %}
