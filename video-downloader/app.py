@@ -49,6 +49,8 @@ def download_video():
     if request.method == "POST":
         urls_text = request.form.get("urls")
         urls = [url.strip() for url in urls_text.split('\n') if url.strip()]
+        # Drop duplicates, keep first occurrence
+        urls = list(dict.fromkeys(urls))
 
         # Configure yt-dlp options
         ydl_opts = {
