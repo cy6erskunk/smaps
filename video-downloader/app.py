@@ -79,7 +79,7 @@ def download_video():
         # Create status message
         if downloaded_videos and not failed_videos:
             if len(downloaded_videos) == 1:
-                message = f'Video "{downloaded_videos[0]}" downloaded successfully!'
+                message = f'Video "{html.escape(downloaded_videos[0])}" downloaded successfully!'
             else:
                 items_html = "".join(f"<li>{html.escape(title)}</li>" for title in downloaded_videos)
                 message = (
