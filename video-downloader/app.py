@@ -62,20 +62,14 @@ def download_video():
         for url in urls:
             try:
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                    # Extract video information
                     info_dict = ydl.extract_info(url, download=True)
                     video_title = info_dict.get("title", None)
-                    
-                    # Use title if available, otherwise find the downloaded filename
-                    if video_title:
-                        downloaded_videos.append(video_title)
-                    else:
-                        # Find the most recently created file as fallback
-                        files = [f for f in os.listdir(DOWNLOAD_DIR) if os.path.isfile(os.path.join(DOWNLOAD_DIR, f))]
-                        if files:
-                            latest_file = max(files, key=lambda f: os.path.getctime(os.path.join(DOWNLOAD_DIR, f)))
-                            downloaded_videos.append(latest_file)
+                    # Get the actual filename yt-dlp wrote (no directory scan needed)
+                    output_path = ydl.prepare_filename(info_dict)
+                    filename = os.path.basename(output_path)
 
+                    # Use title if available, otherwise use yt-dlp’s prepared filename
+                    downloaded_videos.append(video_title or filename)
             except Exception as e:
                 failed_videos.append(f"{url}: {str(e)}")
 
