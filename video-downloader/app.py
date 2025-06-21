@@ -4,6 +4,7 @@ from datetime import datetime
 from collections import defaultdict
 from flask import Flask, render_template, request, send_file, redirect, url_for
 import yt_dlp
+import html
 
 app = Flask(__name__)
 
@@ -47,7 +48,10 @@ def download_video():
     message = None
 
     if request.method == "POST":
-        url = request.form.get("url")
+        urls_text = request.form.get("urls")
+        urls = [url.strip() for url in urls_text.split('\n') if url.strip()]
+        # Drop duplicates, keep first occurrence
+        urls = list(dict.fromkeys(urls))
 
         # Configure yt-dlp options
         ydl_opts = {
@@ -55,20 +59,45 @@ def download_video():
             "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
         }
 
-        try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                # Extract video information
-                info_dict = ydl.extract_info(url, download=True)
-                video_title = info_dict.get("title", None)
+        downloaded_videos = []
+        failed_videos = []
 
-                # Find the downloaded file
-                for file in os.listdir(DOWNLOAD_DIR):
-                    if video_title and video_title in file:
-                        message = f'Video "{video_title}" downloaded successfully!'
-                        break
+        for url in urls:
+            try:
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    info_dict = ydl.extract_info(url, download=True)
+                    video_title = info_dict.get("title", None)
+                    # Get the actual filename yt-dlp wrote (no directory scan needed)
+                    output_path = ydl.prepare_filename(info_dict)
+                    filename = os.path.basename(output_path)
 
-        except Exception as e:
-            message = f"Error downloading video: {str(e)}"
+                    # Use title if available, otherwise use yt-dlp’s prepared filename
+                    downloaded_videos.append(video_title or filename)
+            except Exception as e:
+                failed_videos.append(f"{url}: {str(e)}")
+
+        # Create status message
+        if downloaded_videos and not failed_videos:
+            if len(downloaded_videos) == 1:
+                message = f'Video "{html.escape(downloaded_videos[0])}" downloaded successfully!'
+            else:
+                items_html = "".join(f"<li>{html.escape(title)}</li>" for title in downloaded_videos)
+                message = (
+                    f"Successfully downloaded {len(downloaded_videos)} videos:"
+                    f"<ul>{items_html}</ul>"
+                )
+        elif downloaded_videos and failed_videos:
+            video_word = "video" if len(downloaded_videos) == 1 else "videos"
+            failed_word = "video" if len(failed_videos) == 1 else "videos"
+            if len(downloaded_videos) == 1:
+                message = f'Downloaded "{downloaded_videos[0]}". Failed: {len(failed_videos)} {failed_word}'
+            else:
+                message = f"Downloaded {len(downloaded_videos)} {video_word}. Failed: {len(failed_videos)} {failed_word}"
+        elif failed_videos:
+            failed_word = "video" if len(failed_videos) == 1 else "videos"
+            message = f"Failed to download {len(failed_videos)} {failed_word}. Check URLs."
+        else:
+            message = "No valid URLs provided."
 
     # Get list of downloaded videos grouped by date
     videos_by_date = get_video_files()

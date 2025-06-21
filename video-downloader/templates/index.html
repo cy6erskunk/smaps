@@ -13,6 +13,7 @@
         }
 
         input,
+        textarea,
         button {
             width: 100%;
             padding: 10px;
@@ -61,24 +62,27 @@
             background-color: #f44336;
             color: white;
         }
+
+        .date-row {
+            background-color: #e9ecef;
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
-    <h1>YouTube Video Downloader</h1>
+    <h1>Video Downloader</h1>
     <form method="POST" action="/">
-        <input type="url" name="url" placeholder="Enter YouTube URL" required>
-        <button type="submit">Download Video</button>
+        <textarea name="urls" placeholder="Enter URLs (one per line)" rows="5" required></textarea>
+        <button type="submit">Download</button>
     </form>
 
     {% if message %}
-    <div id="status">{{ message }}</div>
+    <div id="status">{{ message|safe }}</div>
     {% endif %}
 
     {% if videos_by_date %}
     <h2>Downloaded Videos</h2>
-    {% for date, videos in videos_by_date.items() %}
-    <h3>{{ date }}</h3>
     <table>
         <thead>
             <tr>
@@ -88,6 +92,10 @@
             </tr>
         </thead>
         <tbody>
+            {% for date, videos in videos_by_date.items() %}
+            <tr class="date-row">
+                <td colspan="3">{{ date }}</td>
+            </tr>
             {% for video in videos %}
             <tr>
                 <td>{{ video.filename }}</td>
@@ -99,9 +107,9 @@
                 </td>
             </tr>
             {% endfor %}
+            {% endfor %}
         </tbody>
     </table>
-    {% endfor %}
     {% endif %}
 </body>
 
