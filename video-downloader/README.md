@@ -18,6 +18,6 @@ Example with [`uv`](https://docs.astral.sh/uv/):
 
 ```
 uv venv
-uv pip sync requirements.txt
+uv pip install -r requirements.txt
 uv run ./app.py
 ```
