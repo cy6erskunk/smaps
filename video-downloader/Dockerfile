@@ -8,7 +8,7 @@ WORKDIR /app
 RUN python -m venv .venv
 COPY requirements.txt ./
 RUN .venv/bin/pip install -r requirements.txt
-FROM python:3.14.6-slim
+FROM python:3.14.7-slim
 WORKDIR /app
 RUN apt-get update && apt-get install -y ffmpeg
 COPY --from=builder /app/.venv .venv/
