@@ -10,6 +10,8 @@ Simple client-side applications are deployed from the `html/` folder as gihub pa
 
 A mobile-friendly three.js game in `html/ragnaduck/`: a viking survives waves of giant brain-eating ducks. Combo chains, runes between waves, power-ups and an Elder Drake boss every fifth wave. Touch controls on phones; WASD, Space, E, Shift and Q on a keyboard.
 
+The GitHub Pages copy runs offline. Deployed on Vercel with a Neon database it adds GitHub sign-in, a leaderboard and player stats; see `html/ragnaduck/README.md`.
+
 ## gemini-api-tool
 
 A tool a submit request to Gemini 1.5 API together with an image that is provided as an URL. 
